@@ -164,7 +164,7 @@ class JSONReader {
 		rapidjson::CursorStreamWrapper<rapidjson::StringStream> csw(ss);
 		json.ParseStream(csw);
 		if (json.HasParseError()) {
-			qCritical() << QSL("\x1B[33mProblem parsing confing file on line: %1 , pos: %2\x1B[0m").arg(csw.GetLine()).arg(csw.GetColumn());
+			qCritical().noquote() << QSL("\x1B[33mProblem parsing confing file on line: %1 , pos: %2\x1B[0m").arg(csw.GetLine()).arg(csw.GetColumn());
 			return false;
 		}
 		return true;
