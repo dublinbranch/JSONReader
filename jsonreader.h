@@ -66,6 +66,16 @@ class JSONReader {
 	}
 
 	template <typename Type>
+	void swapper(rapidjson::Value::MemberIterator& iter, const char* key, Type& value) {
+		return swapper(&iter->value, key, value);
+	}
+
+	template <typename Type>
+	void swapper(rapidjson::Value& obj, const char* key, Type& value) {
+		swapper(&obj, key, value);
+	}
+
+	template <typename Type>
 	void swapper(rapidjson::Value* obj, const char* key, Type& value) {
 		if (!obj) {
 			qCritical().noquote() << "You need to check for branch existance before this point (we extract the leaf!)" << QStacker16Light();
