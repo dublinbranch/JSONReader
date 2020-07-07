@@ -15,7 +15,7 @@
 QString demangle(const char* name);
 
 template <typename Type>
-QString GetTypeName() {
+QString getTypeName() {
 	auto name = typeid(Type).name();
 	return demangle(name);
 }
@@ -32,7 +32,7 @@ class JSONReader {
 	 * @param key
 	 * @param value
 	 */
-	void swapperJPtr(const char* path, Type& value, rapidjson::Value* src = nullptr) {
+	void swapperJPtr(const char* JSONPointer, Type& value, rapidjson::Value* src = nullptr) {
 		rapidjson::Value* refJson = src;
 
 		if (src) {
@@ -42,20 +42,20 @@ class JSONReader {
 			refJson = &json;
 		}
 
-		rapidjson::Value* useMe = rapidjson::Pointer(path).Get(*refJson);
+		rapidjson::Value* useMe = rapidjson::Pointer(JSONPointer).Get(*refJson);
 		switch (swapper(useMe, value)) {
 		case SwapRes::errorMissing:
-			qCritical().noquote() << "missing JSON Path:" << path << "for REQUIRED parameter" + QStacker16(4, QStackerOptLight);
+			qCritical().noquote() << "missing JSON Path:" << JSONPointer << "for REQUIRED parameter" + QStacker16(4, QStackerOptLight);
 			exit(1);
 			break;
 		case SwapRes::swapped:
-			rapidjson::Pointer(path).Erase(*refJson);
+			rapidjson::Pointer(JSONPointer).Erase(*refJson);
 			break;
 		case SwapRes::typeMismatch:
 			qCritical().noquote() << QSL("Type mismatch! Expecting %1 found %2 for %3")
-			                                 .arg(GetTypeName<Type>())
+			                                 .arg(getTypeName<Type>())
 			                                 .arg(printType(mismatchedType))
-			                                 .arg(path) +
+			                                 .arg(JSONPointer) +
 			                             QStacker16Light();
 			exit(1);
 			break;
@@ -98,7 +98,7 @@ class JSONReader {
 			break;
 		case SwapRes::typeMismatch:
 			qCritical().noquote() << QSL("Type mismatch! Expecting %1 found %2 for %3")
-			                                 .arg(GetTypeName<Type>())
+			                                 .arg(getTypeName<Type>())
 			                                 .arg(printType(mismatchedType))
 			                                 .arg(key) +
 			                             QStacker16Light();
