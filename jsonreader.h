@@ -126,31 +126,35 @@ class JSONReader {
 				if (value == JSONReaderConst::setMe8) {
 					return SwapRes::errorMissing;
 				}
-			}
-			if constexpr (std::is_same<Type, QString>::value) {
+			} else if constexpr (std::is_same<Type, QString>::value) {
 				if (value == JSONReaderConst::setMe) {
 					return SwapRes::errorMissing;
 				}
-			}
-			//higher precedence because, is_integral bool == true!
-			if constexpr (std::is_same<Type, bool>::value) {
+				//higher precedence because, is_integral bool == true!
+			} else if constexpr (std::is_same<Type, bool>::value) {
 				//no reason ATM to enforce required default also for bool
 				return SwapRes::notFound;
-			}
-			if constexpr (std::is_integral<Type>::value) {
+			} else if constexpr (std::is_integral<Type>::value) {
 				if (value == JSONReaderConst::setMeInt) {
 					return SwapRes::errorMissing;
 				}
-			}
-			if constexpr (std::is_floating_point<std::remove_reference<Type>>::value) {
+			} else if constexpr (std::is_floating_point<Type>::value) {
 				if (qIsNaN(value)) {
 					return SwapRes::errorMissing;
 				}
+			} else if constexpr (std::is_same<Type, QStringList>::value) {
+				if (!value.isEmpty() && value[0] == JSONReaderConst::setMe) {
+					return SwapRes::errorMissing;
+				}
+			} else {
+				//poor man static assert that will also print for which type it failed
+				typedef typename Type::something_made_up X;
+
+				X x; //To avoid complain that X is defined but not used
 			}
 			return SwapRes::notFound;
 		}
 
-		//higher precedence because, is_integral bool == true!
 		if constexpr (std::is_same<Type, QByteArray>::value) {
 			value.clear();
 			value.append(obj->GetString());
@@ -158,6 +162,12 @@ class JSONReader {
 		} else if constexpr (std::is_same<Type, QString>::value) {
 			value.clear();
 			value.append(obj->GetString());
+			return SwapRes::swapped;
+		} else if constexpr (std::is_same<Type, QStringList>::value) {
+			value.clear();
+			for (auto& iter : obj->GetArray()) {
+				value.append(iter.GetString());
+			}
 			return SwapRes::swapped;
 		} else { //This should handle all the other
 			if (!obj->template Is<Type>()) {
