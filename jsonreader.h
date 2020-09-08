@@ -1,14 +1,15 @@
 #pragma once
-//must be the first
-#include "rapidjson/includeMePretty.h"
-//******************
+
+#include "rapidjson/cursorstreamwrapper.h"
+#include "rapidjson/includeMe.h"
+#include "rapidjson/pointer.h"
+#include "rapidjson/prettywriter.h"
+
 #include "JSONReaderConst.h"
 #include "QStacker/qstacker.h"
 #include "define.h"
 #include "rapidFunkz/various.h"
-#include "rapidjson/cursorstreamwrapper.h"
 
-#include "rapidjson/pointer.h"
 #include <QDebug>
 #include <QString>
 
