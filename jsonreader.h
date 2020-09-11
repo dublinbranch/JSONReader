@@ -44,7 +44,7 @@ class JSONReader {
 		}
 
 		rapidjson::Value* useMe = rapidjson::Pointer(JSONPointer).Get(*refJson);
-		switch (swapper(useMe, value)) {
+		switch (swapperInner(useMe, value)) {
 		case SwapRes::errorMissing:
 			qCritical().noquote() << "missing JSON Path:" << JSONPointer << "for REQUIRED parameter" + QStacker16(4, QStackerOptLight);
 			exit(1);
@@ -82,6 +82,10 @@ class JSONReader {
 			qCritical().noquote() << "You need to check for branch existance before this point (we extract the leaf!)" << QStacker16Light();
 			exit(1);
 		}
+		if (!obj->IsObject()) {
+			qCritical().noquote() << QSL("You are searching %1 , but this is not an object").arg(key) << QStacker16Light();
+			exit(1);
+		}
 
 		auto              iter  = obj->FindMember(key);
 		rapidjson::Value* useMe = nullptr;
@@ -89,7 +93,7 @@ class JSONReader {
 			useMe = &iter->value;
 		}
 
-		switch (swapper(useMe, value)) {
+		switch (swapperInner(useMe, value)) {
 		case SwapRes::errorMissing:
 			qCritical().noquote() << "missing KEY:" << key << "for REQUIRED parameter" + QStacker16Light();
 			exit(1);
@@ -119,7 +123,7 @@ class JSONReader {
 	};
 
 	template <typename Type>
-	SwapRes swapper(rapidjson::Value* obj, Type& value) {
+	SwapRes swapperInner(rapidjson::Value* obj, Type& value) {
 		if (obj == nullptr) {
 			//check if the default value is a sensible one
 			//empty is a legit value, that is why we use a canary one SET_ME
