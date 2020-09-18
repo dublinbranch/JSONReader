@@ -1,7 +1,7 @@
 #pragma once
+#include "rapidjson/includeMe.h"
 
 #include "rapidjson/cursorstreamwrapper.h"
-#include "rapidjson/includeMe.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/prettywriter.h"
 
