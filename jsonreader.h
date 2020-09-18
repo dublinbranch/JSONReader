@@ -194,6 +194,7 @@ class JSONReader {
 		}
 		return true;
 	}
+
 	template <typename Type>
 	void getta(const char* path, Type& def) {
 		rapidjson::Value* val = rapidjson::Pointer(path).Get(json);
