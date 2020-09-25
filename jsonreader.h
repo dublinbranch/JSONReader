@@ -77,6 +77,13 @@ class JSONReader {
 	}
 
 	template <typename Type>
+	Type swapper(rapidjson::Value* obj, const char* key) {
+		Type value;
+		swapper(obj, key, value);
+		return value;
+	}
+
+	template <typename Type>
 	void swapper(rapidjson::Value* obj, const char* key, Type& value) {
 		if (!obj) {
 			qCritical().noquote() << "You need to check for branch existance before this point (we extract the leaf!)" << QStacker16Light();
@@ -121,6 +128,35 @@ class JSONReader {
 		swapped,      //all ok
 		notFound      // missing but not required
 	};
+
+	template <typename Type>
+	void unroll(rapidjson::Value* el, Type vector) {
+		vector.clear();
+
+		auto array = el->GetArray();
+
+		for (auto iter = array.begin(); iter != array.end();) {
+			typename Type::value_type value;
+			auto                      res = swapperInner(iter, value);
+			switch (res) {
+			case SwapRes::typeMismatch:
+				qCritical().noquote() << QSL("Type mismatch! Expecting %1 found %2 for %3")
+				                                 .arg(getTypeName<Type>())
+				                                 .arg(printType(mismatchedType)) +
+				                             QStacker16Light();
+				exit(1);
+			case SwapRes::swapped:
+				vector.push_back(value);
+				break;
+			default:
+				qCritical().noquote() << QSL("This should not happen: %1").arg(res) +
+				                             QStacker16Light();
+				exit(1);
+			}
+			iter = array.Erase(iter);
+		}
+		stageClear(el);
+	}
 
 	template <typename Type>
 	SwapRes swapperInner(rapidjson::Value* obj, Type& value) {
