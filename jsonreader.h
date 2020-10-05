@@ -210,8 +210,18 @@ class JSONReader {
 				value.append(iter.GetString());
 			}
 			return SwapRes::swapped;
+			// not ok in this way because we do not check the type
+//		} else if constexpr (std::is_same<Type, double>::value) {
+//			value = obj->GetDouble();
+//			return SwapRes::swapped;
 		} else { //This should handle all the other
-			if (!obj->template Is<Type>()) {
+			auto sameType = obj->template Is<Type>();
+			auto doubleOk = std::is_same<Type, double>::value and (obj->IsDouble() or obj->IsInt64());
+			auto ok = sameType or doubleOk;
+
+			if(!ok){
+			// original
+			//if (!obj->template Is<Type>()) {
 				mismatchedType = obj->GetType();
 				return SwapRes::typeMismatch;
 			}
