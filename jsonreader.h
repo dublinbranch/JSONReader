@@ -274,6 +274,7 @@ class JSONReader {
 		return res;
 	}
 
+	//FIXME fare overload perché funzioni anche con tipi primitivi
 	bool stageClear(rapidjson::Value* el, bool verbose = true) {
 		bool empty = true;
 		//check if we have nothing left (or all set as null, so we can delete)
