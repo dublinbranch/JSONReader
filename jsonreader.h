@@ -162,7 +162,7 @@ class JSONReader {
 	SwapRes swapperInner(rapidjson::Value* obj, Type& value) {
 		if (obj == nullptr) {
 			//check if the default value is a sensible one
-			//empty is a legit value, that is why we use a canary one SET_ME
+			//empty is a legit value, that is why we use a canary one `SET_ME`
 			if constexpr (std::is_same<Type, QByteArray>::value) {
 				if (value == JSONReaderConst::setMe8) {
 					return SwapRes::errorMissing;
@@ -187,6 +187,10 @@ class JSONReader {
 				if (!value.isEmpty() && value[0] == JSONReaderConst::setMe) {
 					return SwapRes::errorMissing;
 				}
+			} else if constexpr (std::is_same<Type, std::string>::value) {
+				if (!value.empty() && value == JSONReaderConst::setMeSS) {
+					return SwapRes::errorMissing;
+				}
 			} else {
 				//poor man static assert that will also print for which type it failed
 				typedef typename Type::something_made_up X;
@@ -204,6 +208,10 @@ class JSONReader {
 			value.clear();
 			value.append(obj->GetString());
 			return SwapRes::swapped;
+		} else if constexpr (std::is_same<Type, std::string>::value) {
+			value.clear();
+			value.append(obj->GetString());
+			return SwapRes::swapped;
 		} else if constexpr (std::is_same<Type, QStringList>::value) {
 			value.clear();
 			for (auto& iter : obj->GetArray()) {
@@ -211,17 +219,17 @@ class JSONReader {
 			}
 			return SwapRes::swapped;
 			// not ok in this way because we do not check the type
-//		} else if constexpr (std::is_same<Type, double>::value) {
-//			value = obj->GetDouble();
-//			return SwapRes::swapped;
+			//		} else if constexpr (std::is_same<Type, double>::value) {
+			//			value = obj->GetDouble();
+			//			return SwapRes::swapped;
 		} else { //This should handle all the other
 			auto sameType = obj->template Is<Type>();
 			auto doubleOk = std::is_same<Type, double>::value and (obj->IsDouble() or obj->IsInt64());
-			auto ok = sameType or doubleOk;
+			auto ok       = sameType or doubleOk;
 
-			if(!ok){
-			// original
-			//if (!obj->template Is<Type>()) {
+			if (!ok) {
+				// original
+				//if (!obj->template Is<Type>()) {
 				mismatchedType = obj->GetType();
 				return SwapRes::typeMismatch;
 			}
