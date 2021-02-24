@@ -10,6 +10,7 @@
 #include "define.h"
 #include "rapidFunkz/various.h"
 
+#include "magicEnum/magic_from_string.hpp"
 #include <QDebug>
 #include <QString>
 
@@ -191,6 +192,10 @@ class JSONReader {
 				if (!value.empty() && value == JSONReaderConst::setMeSS) {
 					return SwapRes::errorMissing;
 				}
+			} else if constexpr (std::is_enum<Type>::value) {
+				if (value == Type::null) {
+					return SwapRes::errorMissing;
+				}
 			} else {
 				//poor man static assert that will also print for which type it failed
 				typedef typename Type::something_made_up X;
@@ -222,6 +227,11 @@ class JSONReader {
 			//		} else if constexpr (std::is_same<Type, double>::value) {
 			//			value = obj->GetDouble();
 			//			return SwapRes::swapped;
+		} else if constexpr (std::is_enum<Type>::value) {
+			Type v;
+			magic_enum::fromString<Type>(obj->GetString(), v);
+			value = v;
+			return SwapRes::swapped;
 		} else { //This should handle all the other
 			auto sameType = obj->template Is<Type>();
 			auto doubleOk = std::is_same<Type, double>::value and (obj->IsDouble() or obj->IsInt64());
