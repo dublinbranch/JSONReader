@@ -228,9 +228,7 @@ class JSONReader {
 			//			value = obj->GetDouble();
 			//			return SwapRes::swapped;
 		} else if constexpr (std::is_enum<Type>::value) {
-			Type v;
-			magic_enum::fromString<Type>(obj->GetString(), v);
-			value = v;
+			magic_enum::fromString(obj->GetString(), value);
 			return SwapRes::swapped;
 		} else { //This should handle all the other
 			auto sameType = obj->template Is<Type>();
