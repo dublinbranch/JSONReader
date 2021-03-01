@@ -101,7 +101,8 @@ class JSONReader {
 			useMe = &iter->value;
 		}
 
-		switch (swapperInner(useMe, value)) {
+		auto swapRes = swapperInner(useMe, value);
+		switch (swapRes) {
 		case SwapRes::errorMissing:
 			qCritical().noquote() << "missing KEY:" << key << "for REQUIRED parameter" + QStacker16Light();
 			exit(1);
