@@ -123,6 +123,28 @@ class JSONReader {
 		}
 	}
 
+	template <typename Type>
+	void swapper(rapidjson::Value* obj, Type& value) {
+		switch (swapperInner(obj, value)) {
+		case SwapRes::swapped:
+			obj->SetNull();
+			break;
+		case SwapRes::typeMismatch:
+			qCritical().noquote() << QSL("Type mismatch! Expecting %1 found %2 for %3")
+			                                 .arg(getTypeName<Type>())
+			                                 .arg(printType(mismatchedType)) +
+			                             QStacker16Light();
+			exit(1);
+		case SwapRes::errorMissing:
+			qCritical().noquote() << "missing value for REQUIRED parameter" + QStacker16Light();
+			exit(1);
+			break;
+		case SwapRes::notFound:
+			//nothing to do here
+			break;
+		}
+	}
+
 	enum SwapRes {
 		typeMismatch,
 		errorMissing, //the value was needed, but not founded
@@ -159,6 +181,7 @@ class JSONReader {
 		stageClear(el);
 	}
 
+      private:
 	template <typename Type>
 	SwapRes swapperInner(rapidjson::Value* obj, Type& value) {
 		if (obj == nullptr) {
@@ -231,21 +254,20 @@ class JSONReader {
 			magic_enum::fromString(obj->GetString(), value);
 			return SwapRes::swapped;
 		} else { //This should handle all the other
-			auto sameType = obj->template Is<Type>();
-			auto doubleOk = std::is_same<Type, double>::value and (obj->IsDouble() or obj->IsInt64());
-			auto ok       = sameType or doubleOk;
-
-			if (!ok) {
-				// original
-				//if (!obj->template Is<Type>()) {
-				mismatchedType = obj->GetType();
-				return SwapRes::typeMismatch;
+			if (obj->GetType() == rapidjson::Type::kNumberType && std::is_arithmetic_v<Type>) {
+				//as suggested in https://github.com/Tencent/rapidjson/issues/823
+				value = obj->GetDouble();
+				return SwapRes::swapped;
+			} else if (obj->template Is<Type>()) {
+				value = obj->template Get<Type>();
+				return SwapRes::swapped;
 			}
-			value = obj->template Get<Type>();
-			return SwapRes::swapped;
+			mismatchedType = obj->GetType();
+			return SwapRes::typeMismatch;
 		}
 	}
 
+      public:
 	bool parse(const QByteArray& raw) {
 		rapidjson::StringStream                                 ss(raw.constData());
 		rapidjson::CursorStreamWrapper<rapidjson::StringStream> csw(ss);
