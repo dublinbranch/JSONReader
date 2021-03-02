@@ -146,6 +146,13 @@ class JSONReader {
 		}
 	}
 
+	template <typename Type>
+	Type swapGet(rapidjson::Value* obj) {
+		Type temp;
+		swapper(obj, temp);
+		return temp;
+	}
+
 	enum SwapRes {
 		typeMismatch,
 		errorMissing, //the value was needed, but not founded
