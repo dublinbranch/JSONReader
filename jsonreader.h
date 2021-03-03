@@ -91,7 +91,7 @@ class JSONReader {
 			exit(1);
 		}
 		if (!obj->IsObject()) {
-			qCritical().noquote() << QSL("You are searching %1 , but this is not an object").arg(key) << QStacker16Light();
+			qCritical().noquote() << QSL("You are searching %1 inside this element, but this is not an object, is a %2").arg(key).arg(obj->GetType()) << QStacker16Light();
 			exit(1);
 		}
 
