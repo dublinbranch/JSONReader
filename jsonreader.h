@@ -236,19 +236,19 @@ class JSONReader {
 			return SwapRes::notFound;
 		}
 
-		if constexpr (std::is_same<Type, QByteArray>::value) {
+		if constexpr (std::is_same_v<Type, QByteArray>) {
 			value.clear();
 			value.append(obj->GetString());
 			return SwapRes::swapped;
-		} else if constexpr (std::is_same<Type, QString>::value) {
+		} else if constexpr (std::is_same_v<Type, QString>) {
 			value.clear();
 			value.append(obj->GetString());
 			return SwapRes::swapped;
-		} else if constexpr (std::is_same<Type, std::string>::value) {
+		} else if constexpr (std::is_same_v<Type, std::string>) {
 			value.clear();
 			value.append(obj->GetString());
 			return SwapRes::swapped;
-		} else if constexpr (std::is_same<Type, QStringList>::value) {
+		} else if constexpr (std::is_same_v<Type, QStringList>) {
 			value.clear();
 			for (auto& iter : obj->GetArray()) {
 				value.append(iter.GetString());
@@ -258,7 +258,7 @@ class JSONReader {
 			//		} else if constexpr (std::is_same<Type, double>::value) {
 			//			value = obj->GetDouble();
 			//			return SwapRes::swapped;
-		} else if constexpr (std::is_enum<Type>::value) {
+		} else if constexpr (std::is_enum_v<Type>) {
 			magic_enum::fromString(obj->GetString(), value);
 			return SwapRes::swapped;
 		} else { //This should handle all the other
