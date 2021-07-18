@@ -297,20 +297,7 @@ class JSONReader {
 			rapidjson::Pointer(path).Erase(json);
 		}
 	}
-	QByteArray subJsonRender(rapidjson::Value* el) {
-		auto&               allocator = json.GetAllocator();
-		rapidjson::Document d;
-		rapidjson::Value    v2(*el, allocator);
-
-		rapidjson::StringBuffer                          buffer;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-		d.CopyFrom(*el, allocator);
-		d.Accept(writer);
-		QByteArray res = "\n";
-		res.append(buffer.GetString(), buffer.GetSize());
-		res.append("\n");
-		return res;
-	}
+	QByteArray subJsonRender(rapidjson::Value* el);
 
 	QByteArray jsonRender() {
 		rapidjson::StringBuffer                          buffer;
