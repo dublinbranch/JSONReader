@@ -27,6 +27,8 @@ class JSONReader {
 	rapidjson::Document json;
 	//No idea how to have this value flow around
 	rapidjson::Type mismatchedType;
+	//keep the value during the swap process
+	bool keep = false;
 
 	template <typename Type>
 	/**
@@ -108,7 +110,9 @@ class JSONReader {
 			exit(1);
 			break;
 		case SwapRes::swapped:
-			obj->RemoveMember(iter);
+			if (!keep) {
+				obj->RemoveMember(iter);
+			}
 			break;
 		case SwapRes::typeMismatch:
 			qCritical().noquote() << QSL("Type mismatch! Expecting %1 found %2 for %3")
@@ -128,7 +132,9 @@ class JSONReader {
 	void swapper(rapidjson::Value* obj, Type& value) {
 		switch (swapperInner(obj, value)) {
 		case SwapRes::swapped:
-			obj->SetNull();
+			if (!keep) {
+				obj->SetNull();
+			}
 			break;
 		case SwapRes::typeMismatch:
 			qCritical().noquote() << QSL("Type mismatch! Expecting %1 found %2 for %3")
@@ -282,8 +288,9 @@ class JSONReader {
 		json.ParseStream(csw);
 		if (json.HasParseError()) {
 			qCritical().noquote() << QSL("\x1B[33mProblem parsing json on line: %1 , pos: %2\x1B[0m")
-									 .arg(csw.GetLine())
-									 .arg(csw.GetColumn()) << QStacker16Light();
+			                             .arg(csw.GetLine())
+			                             .arg(csw.GetColumn())
+			                      << QStacker16Light();
 			return false;
 		}
 		return true;
