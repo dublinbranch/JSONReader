@@ -282,19 +282,7 @@ class JSONReader {
 	}
 
       public:
-	bool parse(const QByteArray& raw) {
-		rapidjson::StringStream                                 ss(raw.constData());
-		rapidjson::CursorStreamWrapper<rapidjson::StringStream> csw(ss);
-		json.ParseStream(csw);
-		if (json.HasParseError()) {
-			qCritical().noquote() << QSL("\x1B[33mProblem parsing json on line: %1 , pos: %2\x1B[0m")
-			                             .arg(csw.GetLine())
-			                             .arg(csw.GetColumn())
-			                      << QStacker16Light();
-			return false;
-		}
-		return true;
-	}
+	bool parse(const QByteArray& raw);
 
 	template <typename Type>
 	void getta(const char* path, Type& def) {
@@ -306,62 +294,10 @@ class JSONReader {
 	}
 	QByteArray subJsonRender(rapidjson::Value* el);
 
-	QByteArray jsonRender() {
-		rapidjson::StringBuffer                          buffer;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-		json.Accept(writer);
-		QByteArray res = "\n";
-		res.append(buffer.GetString(), buffer.GetSize());
-		res.append("\n");
-		return res;
-	}
+	QByteArray jsonRender();
 
 	//FIXME fare overload perché funzioni anche con tipi primitivi
-	bool stageClear(rapidjson::Value* el, bool verbose = true) {
-		bool empty = true;
-		//check if we have nothing left (or all set as null, so we can delete)
-		if (el->IsObject()) {
-			for (auto&& iter : el->GetObject()) {
-				empty = empty & stageClear(&iter.value, false);
-				if (!empty) {
-					break;
-				}
-			}
-		} else if (el->IsArray()) {
-			for (auto&& iter : el->GetArray()) {
-				empty = empty & stageClear(&iter, false);
-				if (!empty) {
-					break;
-				}
-			}
-		} else if (!el->IsNull()) {
-			empty = false;
-		}
+	bool stageClear(rapidjson::Value* el, bool verbose = true);
 
-		if (empty) {
-			el->SetNull();
-			return true;
-		} else if (verbose) {
-			qCritical().noquote() << "non empty local JSON block" << subJsonRender(el)
-			                      << "Full JSON is now" << jsonRender()
-			                      << QStacker16(4, QStackerOptLight);
-		}
-		return false;
-	}
-
-	bool stageClear() {
-		bool empty = true;
-		for (auto&& iter : json.GetObject()) {
-			empty = empty & stageClear(&iter.value, false);
-			if (!empty) {
-				break;
-			}
-		}
-		if (!empty) {
-			qCritical().noquote() << "non empty Full JSON at the end of parsing, remnant is" << jsonRender()
-			                      << QStacker16(4, QStackerOptLight);
-			return false;
-		}
-		return true;
-	}
+	bool stageClear();
 };
