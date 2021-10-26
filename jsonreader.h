@@ -7,6 +7,15 @@
 
 #include "JSONReaderConst.h"
 #include "QStacker/qstacker.h"
+/*
+ * setup
+ * - copy define_template.h in the folder of the main project
+ * - rename it in define.h
+ *
+ * e.g.
+ * /project1/JSONReader (this submodule)
+ * /project1/define.h
+ */
 #include "define.h"
 #include "rapidFunkz/various.h"
 
