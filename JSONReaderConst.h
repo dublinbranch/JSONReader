@@ -1,5 +1,6 @@
 #pragma once
 #include <QString>
+#include <limits>
 namespace JSONReaderConst {
 const std::string setMeSS     = "SET_ME";
 const QString     setMe       = "SET_ME";
