@@ -41,7 +41,7 @@ class JSONReader {
 
 	template <typename Type>
 	/**
-	 * @brief swapperJPtr 
+	 * @brief swapperJPtr
 	 * @param key
 	 * @param value
 	 */
@@ -295,7 +295,11 @@ class JSONReader {
 
 	template <typename Type>
 	void getta(const char* path, Type& def) {
-		rapidjson::Value* val = rapidjson::Pointer(path).Get(json);
+		const auto& ptr = rapidjson::Pointer(path);
+		if (!ptr.IsValid()) {
+			throw ExceptionV2(QSL("invalid json path: ") + path + QSL(" Error: ") + asString(ptr.GetParseErrorCode()));
+		}
+		rapidjson::Value* val = ptr.Get(json);
 		if (val) {
 			swapper(val, def);
 			rapidjson::Pointer(path).Erase(json);
