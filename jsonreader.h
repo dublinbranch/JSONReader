@@ -291,7 +291,9 @@ class JSONReader {
 	}
 
       public:
+	bool parse(const std::string& raw);
 	bool parse(const QByteArray& raw);
+	bool parse(const char* raw);
 
 	template <typename Type>
 	void getta(const char* path, Type& def) {

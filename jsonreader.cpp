@@ -99,15 +99,23 @@ bool JSONReader::stageClear() {
 	return true;
 }
 
+bool JSONReader::parse(const std::string& raw) {
+	return parse(raw.data());
+}
+
 bool JSONReader::parse(const QByteArray& raw) {
-	rapidjson::StringStream                                 ss(raw.constData());
+	return parse(raw.constData());
+}
+
+bool JSONReader::parse(const char* raw) {
+	rapidjson::StringStream                                 ss(raw);
 	rapidjson::CursorStreamWrapper<rapidjson::StringStream> csw(ss);
 	json.ParseStream(csw);
 	if (json.HasParseError()) {
 		qCritical().noquote() << QSL("Problem parsing json on line: %1 , pos: %2\nRaw Json: %3")
 		                             .arg(csw.GetLine())
 		                             .arg(csw.GetColumn())
-		                             .arg(QString(raw.left(512)))
+		                             .arg(QString(raw).left(512))
 		                      << QStacker16Light();
 		return false;
 	}
