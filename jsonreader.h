@@ -7,21 +7,15 @@
 
 #include "JSONReaderConst.h"
 #include "QStacker/qstacker.h"
-/*
- * setup
- * - copy define_template.h in the folder of the main project
- * - rename it in define.h
- *
- * e.g.
- * /project1/JSONReader (this submodule)
- * /project1/define.h
- */
-#include "define.h"
 #include "rapidFunkz/various.h"
 
 #include "magicEnum/magic_from_string.hpp"
 #include <QDebug>
 #include <QString>
+
+
+#define QBL(str) QByteArrayLiteral(str)
+#define QSL(str) QStringLiteral(str)
 
 QString demangle(const char* name);
 
