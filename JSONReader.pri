@@ -10,4 +10,3 @@ SOURCES += \
 DISTFILES += /
 	$$PWD/README.md
 
-include(JSONReader/JSONReader.pri)
