@@ -39,6 +39,11 @@ class JSONReader {
 	//keep the value during the swap process
 	bool keep = false;
 
+	bool   hasDecodeError = false;
+	size_t errLine        = 0;
+	size_t errColumn      = 0;
+	size_t errPos         = 0;
+
 	template <typename Type>
 	/**
 	 * @brief swapperJPtr
@@ -291,7 +296,7 @@ class JSONReader {
 	}
 
       public:
-	bool parse(const QByteArray& raw);
+	bool parse(const QByteArray& raw, bool quiet = false);
 
 	template <typename Type>
 	void getta(const char* path, Type& def) {
