@@ -99,6 +99,7 @@ bool JSONReader::stageClear() {
 	return true;
 }
 
+<<<<<<< HEAD
 bool JSONReader::parse(const QByteArray& raw, bool quiet) {
 	rapidjson::StringStream                                 ss(raw.constData());
 	rapidjson::CursorStreamWrapper<rapidjson::StringStream> csw(ss);
@@ -116,6 +117,26 @@ bool JSONReader::parse(const QByteArray& raw, bool quiet) {
 			                                 .arg(QString(raw.left(errPos + 1)))
 			                          << QStacker16Light();
 		}
+=======
+bool JSONReader::parse(const std::string& raw) {
+	return parse(raw.data());
+}
+
+bool JSONReader::parse(const QByteArray& raw) {
+	return parse(raw.constData());
+}
+
+bool JSONReader::parse(const char* raw) {
+	rapidjson::StringStream                                 ss(raw);
+	rapidjson::CursorStreamWrapper<rapidjson::StringStream> csw(ss);
+	json.ParseStream(csw);
+	if (json.HasParseError()) {
+		qCritical().noquote() << QSL("Problem parsing json on line: %1 , pos: %2\nRaw Json: %3")
+		                             .arg(csw.GetLine())
+		                             .arg(csw.GetColumn())
+		                             .arg(QString(raw).left(512))
+		                      << QStacker16Light();
+>>>>>>> 4c5b5f148510b35619df6d7c4293cd5bbbe9d2e8
 		return false;
 	}
 	return true;

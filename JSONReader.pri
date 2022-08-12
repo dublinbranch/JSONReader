@@ -9,3 +9,4 @@ SOURCES += \
 
 DISTFILES += /
 	$$PWD/README.md
+
