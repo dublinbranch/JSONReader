@@ -13,7 +13,6 @@
 #include <QDebug>
 #include <QString>
 
-
 #define QBL(str) QByteArrayLiteral(str)
 #define QSL(str) QStringLiteral(str)
 
@@ -290,7 +289,7 @@ class JSONReader {
 	bool parse(const char* raw);
 
 	template <typename Type>
-	void getta(const char* path, Type& def) {
+	void byPtr(const char* path, Type& def) {
 		const auto& ptr = rapidjson::Pointer(path);
 		if (!ptr.IsValid()) {
 			throw ExceptionV2(QSL("invalid json path: ") + path + QSL(" Error: ") + asString(ptr.GetParseErrorCode()));
@@ -301,6 +300,7 @@ class JSONReader {
 			rapidjson::Pointer(path).Erase(json);
 		}
 	}
+
 	QByteArray subJsonRender(rapidjson::Value* el);
 
 	QByteArray jsonRender();
